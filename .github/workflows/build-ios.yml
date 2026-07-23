@@ -28,6 +28,18 @@ jobs:
       - name: Add iOS platform
         run: npx cap add ios || true
 
+      - name: Fix AppDelegate for Capacitor 8 SPM compatibility
+        run: |
+          python3 -c "
+          content = open('ios/App/App/AppDelegate.swift').read()
+          content = content.replace(
+              'return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)',
+              'if userActivity.activityType == NSUserActivityTypeBrowsingWeb, let url = userActivity.webpageURL { NotificationCenter.default.post(name: .capacitorOpenUniversalLink, object: [\"url\": url]); return true }; return false'
+          )
+          open('ios/App/App/AppDelegate.swift', 'w').write(content)
+          print('AppDelegate patched successfully')
+          "
+
       - name: Sync Capacitor
         run: npx cap sync ios
 
