@@ -31,15 +31,33 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync ios
 
+      - name: Install CocoaPods dependencies
+        working-directory: ios/App
+        run: |
+          pod install || true
+
       - name: Build for iOS Simulator
         working-directory: ios/App
         run: |
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
-            -sdk iphonesimulator \
-            -configuration Debug \
-            -derivedDataPath $PWD/build \
-            build
+          if [ -f "App.xcworkspace" ]; then
+            xcodebuild -workspace App.xcworkspace \
+              -scheme App \
+              -sdk iphonesimulator \
+              -configuration Debug \
+              -derivedDataPath $PWD/build \
+              build
+          elif [ -f "App.xcodeproj" ]; then
+            xcodebuild -project App.xcodeproj \
+              -scheme App \
+              -sdk iphonesimulator \
+              -configuration Debug \
+              -derivedDataPath $PWD/build \
+              build
+          else
+            echo "No .xcworkspace or .xcodeproj found"
+            ls -la
+            exit 1
+          fi
 
       - name: Zip .app bundle
         run: |
