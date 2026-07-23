@@ -1,0 +1,12 @@
+{
+  "appId": "com.tagger.pos",
+  "appName": "TAGGER PRO",
+  "webDir": "vercel_deploy",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {}
+}

@@ -1,0 +1,52 @@
+{
+    "env": {
+        "browser": true,
+        "es2021": true
+    },
+    "parserOptions": {
+        "ecmaVersion": "latest",
+        "sourceType": "script"
+    },
+    "globals": {
+        "supabase": "readonly",
+        "tailwind": "readonly",
+        "Chart": "readonly",
+        "Html5Qrcode": "readonly",
+        "html2canvas": "readonly",
+        "jspdf": "readonly",
+        "Dexie": "readonly",
+        "SUPABASE_URL": "readonly",
+        "SUPABASE_KEY": "readonly",
+        "sb": "readonly",
+        "storeId": "readonly",
+        "currentStoreId": "readonly",
+        "userRole": "readonly",
+        "isSuperAdmin": "readonly",
+        "localProducts": "writable",
+        "allCustomers": "writable",
+        "allInvoices": "writable",
+        "maintenanceTickets": "writable",
+        "financeTransactions": "writable",
+        "shifts": "writable",
+        "currentShift": "writable",
+        "suppliers": "writable",
+        "supplierTransactions": "writable",
+        "users": "writable",
+        "currentUserData": "writable",
+        "showToast": "writable",
+        "esc": "readonly",
+        "Pagination": "readonly",
+        "Skeleton": "readonly",
+        "ErrorBoundary": "readonly",
+        "LazyLoader": "readonly"
+    },
+    "rules": {
+        "no-unused-vars": "warn",
+        "no-undef": "error",
+        "no-console": "off",
+        "no-eval": "warn",
+        "no-implied-eval": "warn",
+        "eqeqeq": "warn",
+        "no-unreachable": "error"
+    }
+}

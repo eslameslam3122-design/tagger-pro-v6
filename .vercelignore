@@ -1,0 +1,8 @@
+node_modules/
+dist/
+edge-functions/
+*.sql
+*.log
+output.log
+.eslintrc.json
+.prettierrc
