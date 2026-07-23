@@ -1,0 +1,74 @@
+name: Build iOS Real Device (IPA)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify Node version
+        run: node --version
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Clear npx cache
+        run: npx clear-npx-cache || true
+
+      - name: Add iOS platform
+        run: npx cap add ios || true
+
+      - name: Fix AppDelegate for Capacitor 8 SPM compatibility
+        run: |
+          python3 -c "
+          content = open('ios/App/App/AppDelegate.swift').read()
+          content = content.replace(
+              'return ApplicationDelegateProxy.shared.application(application, continue: userActivity, restorationHandler: restorationHandler)',
+              'if userActivity.activityType == NSUserActivityTypeBrowsingWeb, let url = userActivity.webpageURL { NotificationCenter.default.post(name: .capacitorOpenUniversalLink, object: [\"url\": url]); return true }; return false'
+          )
+          open('ios/App/App/AppDelegate.swift', 'w').write(content)
+          print('AppDelegate patched successfully')
+          "
+
+      - name: Sync Capacitor
+        run: npx cap sync ios
+
+      - name: Install CocoaPods dependencies
+        working-directory: ios/App
+        run: |
+          pod install || true
+
+      - name: Build for Real Device
+        working-directory: ios/App
+        run: |
+          xcodebuild -project App.xcodeproj \
+            -scheme App \
+            -sdk iphoneos \
+            -configuration Release \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=YES \
+            -derivedDataPath $PWD/build \
+            build
+
+      - name: Create IPA
+        working-directory: ios/App
+        run: |
+          mkdir -p Payload
+          cp -r build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -r -y TaggerPro-Device.ipa Payload
+          rm -rf Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: tagger-pro-ios-device
+          path: ios/App/TaggerPro-Device.ipa
