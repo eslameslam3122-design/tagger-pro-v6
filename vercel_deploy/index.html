@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tagger POS V6 - بوابة تسجيل الدخول</title>
+    <script src="vendor/js/tailwind.js"></script>
+    <script src="vendor/js/supabase.min.js"></script>
+    <script src="vendor/js/particles.min.js"></script>
+    <link href="vendor/fonts/cairo.css" rel="stylesheet">
+    <link rel="stylesheet" href="vendor/fontawesome/all.min.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#9333ea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Cairo', sans-serif; height: 100vh; overflow: hidden; background: #060911; }
+
+        #main-container {
+            position: relative;
+            background: radial-gradient(circle at center, #0f1a30 0%, #05070f 100%);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .login-box {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 420px;
+            background: rgba(15, 21, 36, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 2rem 2.5rem;
+            border-radius: 24px;
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 
+                        0 0 30px rgba(37, 99, 235, 0.15),
+                        inset 0 1px 1px rgba(255,255,255,0.1);
+            animation: fadeInBox 1s ease-out;
+        }
+
+        .logo-wrapper {
+            position: relative;
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 1.5rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .orbit-ring-1 {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px dashed rgba(6, 182, 212, 0.4);
+            border-radius: 50%;
+            animation: spinClockwise 12s linear infinite;
+        }
+
+        .orbit-ring-2 {
+            position: absolute;
+            width: 85%;
+            height: 85%;
+            border: 1px dotted rgba(59, 130, 246, 0.6);
+            border-radius: 50%;
+            animation: spinCounterClockwise 8s linear infinite;
+        }
+
+        .logo-core {
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(135deg, #00d2ff 0%, #0066ff 100%);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px #0066ff;
+            transform: rotate(45deg);
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        .logo-text-inner {
+            transform: rotate(-45deg);
+            font-family: 'Cairo', sans-serif;
+            font-weight: 900;
+            color: #ffffff;
+            font-size: 1.5rem;
+            letter-spacing: -1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @keyframes spinClockwise {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes spinCounterClockwise {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 102, 255, 0.7), inset 0 0 10px rgba(255,255,255,0.3); transform: rotate(45deg) scale(1); }
+            50% { box-shadow: 0 0 35px rgba(0, 210, 255, 0.9), inset 0 0 15px rgba(255,255,255,0.5); transform: rotate(45deg) scale(1.04); }
+        }
+        @keyframes fadeInBox {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .neon-title {
+            text-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+        }
+
+        input { text-align: center; transition: all 0.3s ease !important; }
+        input:focus {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+            background-color: #0c1322 !important;
+        }
+
+        .btn-spinner { display: none; }
+        .btn-loading .btn-text { display: none; }
+        .btn-loading .btn-spinner { display: inline-block; }
+        .btn-loading { pointer-events: none; opacity: 0.7; }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .spinner-icon { animation: spin 0.8s linear infinite; display: inline-block; }
+
+        .pass-wrapper { position: relative; }
+        .pass-toggle {
+            position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: #64748b; cursor: pointer; padding: 4px;
+            font-size: 14px; transition: color 0.2s;
+        }
+        .pass-toggle:hover { color: #94a3b8; }
+
+        .form-slide { transition: opacity 0.3s ease, transform 0.3s ease; }
+        .form-hidden { opacity: 0; transform: translateY(10px); pointer-events: none; position: absolute; width: 100%; }
+        .form-visible { opacity: 1; transform: translateY(0); position: relative; width: 100%; }
+    </style>
+</head>
+<body>
+
+    <div id="main-container">
+        <div id="particles-js"></div>
+
+        <div class="login-box">
+            
+            <div class="logo-wrapper">
+                <div class="orbit-ring-1"></div>
+                <div class="orbit-ring-2"></div>
+                <div class="logo-core">
+                    <span class="logo-text-inner">TG</span>
+                </div>
+            </div>
+
+            <div class="text-center mb-6">
+                <h1 class="text-2xl font-black text-white tracking-wider neon-title">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">TAGGER</span> PRO
+                </h1>
+                <p class="text-[11px] text-slate-400 mt-2 font-medium tracking-wide" id="systemStatus">جاري استدعاء خوادم التحقق المشفرة...</p>
+            </div>
+
+            <div class="flex bg-[#090d16] p-1 rounded-xl mb-5 border border-slate-800/80 text-xs">
+                <button type="button" onclick="toggleForm('program')" id="tab-program" class="flex-1 py-2.5 text-center rounded-lg bg-blue-600/20 text-blue-400 font-bold transition-all duration-300">🚪 دخول الموظفين</button>
+                <button type="button" onclick="toggleForm('server')" id="tab-server" class="flex-1 py-2.5 text-center rounded-lg text-slate-500 font-medium transition-all duration-300">🌐 سيرفر المالك</button>
+            </div>
+
+            <form id="programForm" onsubmit="handleStaffLogin(event);" class="space-y-4 form-slide form-visible">
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1.5 mr-1">هوية المستخدم أو المسمى الوظيفي</label>
+                    <input type="text" id="staffUser" required class="w-full bg-[#070b12] border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-blue-500 text-sm" placeholder="اسم المستخدم">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1.5 mr-1">كلمة المرور</label>
+                    <div class="pass-wrapper">
+                        <input type="password" id="staffPass" required class="w-full bg-[#070b12] border border-slate-800 rounded-xl px-4 py-3 pl-10 text-white outline-none focus:border-blue-500 text-sm" placeholder="••••••••">
+                        <button type="button" class="pass-toggle" onclick="togglePass('staffPass', this)" tabindex="-1"><i class="fa-solid fa-eye"></i></button>
+                    </div>
+                </div>
+                <button type="submit" id="loginBtn" class="w-full py-3.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-500 hover:to-indigo-600 text-white font-black rounded-xl text-xs transition-all duration-300 shadow-lg shadow-blue-950/60 hover:scale-[1.02]">
+                    <span class="btn-text">تخويل الدخول الفوري 🚀</span>
+                    <span class="btn-spinner"><i class="fa-solid fa-spinner spinner-icon"></i> جاري التحقق...</span>
+                </button>
+            </form>
+
+            <form id="serverForm" onsubmit="handleServerActivation(event);" class="space-y-4 form-slide form-hidden">
+                <div class="bg-blue-950/40 border border-blue-900/50 p-3 rounded-xl text-[10px] text-cyan-400 text-center leading-relaxed">
+                    تنشيط محلي: يرجى إدخال بيانات التحكم الرئيسية لمرة واحدة لربط هذا الجهاز.
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1 mr-1">بريد المالك (Supabase)</label>
+                    <input type="email" id="serverEmail" class="w-full bg-[#070b12] border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-cyan-500 text-left font-mono text-sm" placeholder="owner@tagger.com">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-slate-400 mb-1 mr-1">مفتاح السر الخاص بالخادم</label>
+                    <input type="password" id="serverPassword" class="w-full bg-[#070b12] border border-slate-800 rounded-xl px-4 py-3 text-white outline-none focus:border-cyan-500 text-left text-sm" placeholder="••••••••">
+                </div>
+                <button type="submit" id="serverBtn" class="w-full py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs transition shadow-lg shadow-emerald-950/50">
+                    <span class="btn-text">مزامنة وتفعيل قاعدة البيانات 🌐</span>
+                    <span class="btn-spinner"><i class="fa-solid fa-spinner spinner-icon"></i> جاري التفعيل...</span>
+                </button>
+            </form>
+
+            <div id="msgBox" class="mt-4 p-3 rounded-xl text-xs text-center hidden border"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // TAGGER POS V6 - Supabase Edition
+        // ============================================================
+
+        const URL_ENV = "https://kxavxmgjqximpuouzejr.supabase.co";
+        const KEY_ENV = "sb_publishable_wU-5h54z8dnIrASa3h4t8g_ZXo0fYnk";
+        const supabaseClient = supabase.createClient(URL_ENV, KEY_ENV);
+
+        // ============================================================
+        // التهيئة
+        // ============================================================
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            particlesJS("particles-js", {
+                particles: {
+                    number: { value: 75, density: { enable: true, value_area: 800 } },
+                    color: { value: "#00d2ff" },
+                    shape: { type: "circle" },
+                    opacity: { value: 0.25, random: true, anim: { enable: true, speed: 1, opacity_min: 0.05, sync: false } },
+                    size: { value: 2.5, random: true },
+                    line_linked: { enable: true, distance: 140, color: "#0066ff", opacity: 0.2, width: 1 },
+                    move: { enable: true, speed: 1.5, direction: "none", random: true, straight: false, out_mode: "out", bounce: false }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: { onhover: { enable: true, mode: "grab" }, onclick: { enable: true, mode: "push" }, resize: true },
+                    modes: { grab: { distance: 180, line_linked: { opacity: 0.4 } }, push: { particles_nb: 3 } }
+                },
+                retina_detect: true
+            });
+
+            // التحقق من جلسة Supabase
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            const statusText = document.getElementById('systemStatus');
+            
+            if (session) {
+                statusText.innerHTML = "🟢 الاتصال بالسيرفر السحابي: <span class='text-emerald-400 font-bold'>نشط وآمن</span>";
+                toggleForm('program');
+            } else {
+                statusText.innerHTML = "🔴 السيرفر <span class='text-red-400 font-bold'>غير مفعل</span>. يرجى تفعيل حساب المالك أولاً.";
+                toggleForm('server');
+            }
+        });
+
+        // ============================================================
+        // التبديل بين التبويبات (مع أنيميشن)
+        // ============================================================
+
+        function toggleForm(type) {
+            const serverForm = document.getElementById('serverForm');
+            const programForm = document.getElementById('programForm');
+            const tabServer = document.getElementById('tab-server');
+            const tabProgram = document.getElementById('tab-program');
+
+            if (type === 'server') {
+                programForm.classList.remove('form-visible');
+                programForm.classList.add('form-hidden');
+                serverForm.classList.remove('form-hidden');
+                serverForm.classList.add('form-visible');
+                tabServer.className = "flex-1 py-2.5 text-center rounded-lg bg-cyan-600/20 text-cyan-400 font-bold transition-all duration-300";
+                tabProgram.className = "flex-1 py-2.5 text-center rounded-lg text-slate-500 font-medium transition-all duration-300";
+            } else {
+                serverForm.classList.remove('form-visible');
+                serverForm.classList.add('form-hidden');
+                programForm.classList.remove('form-hidden');
+                programForm.classList.add('form-visible');
+                tabProgram.className = "flex-1 py-2.5 text-center rounded-lg bg-blue-600/20 text-blue-400 font-bold transition-all duration-300";
+                tabServer.className = "flex-1 py-2.5 text-center rounded-lg text-slate-500 font-medium transition-all duration-300";
+            }
+        }
+
+        // ============================================================
+        // إظهار/إخفاء كلمة المرور
+        // ============================================================
+
+        function togglePass(inputId, btn) {
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye';
+            }
+        }
+
+        // ============================================================
+        // عرض الرسائل
+        // ============================================================
+
+        function printMsg(text, isError = false) {
+            const box = document.getElementById('msgBox');
+            box.className = isError ? "mt-4 p-3 rounded-xl text-xs text-center border border-red-900/30 bg-red-950/20 text-red-400" : "mt-4 p-3 rounded-xl text-xs text-center border border-blue-900/30 bg-blue-950/20 text-blue-400";
+            box.innerText = text;
+            box.classList.remove('hidden');
+        }
+
+        // ============================================================
+        // تفعيل السيرفر (تسجيل الدخول إلى Supabase)
+        // ============================================================
+
+        async function handleServerActivation(e) {
+            e.preventDefault();
+            const email = document.getElementById('serverEmail').value.trim();
+            const pass = document.getElementById('serverPassword').value;
+            const btn = document.getElementById('serverBtn');
+            
+            if(!email || !pass) { 
+                printMsg("❌ يرجى كتابة الإيميل والباسورد", true); 
+                return; 
+            }
+            btn.classList.add('btn-loading');
+            btn.disabled = true;
+            printMsg("جاري الاتصال بالسيرفر وتوثيق الجهاز...");
+
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+            btn.classList.remove('btn-loading');
+            btn.disabled = false;
+            if (error) { 
+                printMsg("❌ فشل التفعيل: خطأ في بيانات السيرفر أو باقة العميل", true); 
+                return; 
+            }
+
+            // حفظ بيانات الجلسة
+            localStorage.setItem('sb_email', email);
+
+            printMsg("🟢 تم تفعيل السيرفر بنجاح! يمكنك الآن الدخول ببيانات المستخدمين.");
+            document.getElementById('systemStatus').innerHTML = "🟢 السيرفر <span class='text-emerald-400 font-bold'>مُفعل ومتصل</span> بنجاح.";
+            setTimeout(() => { 
+                toggleForm('program'); 
+                document.getElementById('msgBox').classList.add('hidden'); 
+            }, 1500);
+        }
+
+        // ============================================================
+        // تسجيل دخول الموظفين (من Supabase)
+        // ============================================================
+
+        async function handleStaffLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('staffUser').value.trim();
+            const pass = document.getElementById('staffPass').value.trim();
+            const btn = document.getElementById('loginBtn');
+
+            if (!user || !pass) {
+                printMsg("⚠️ يرجى إدخال اسم المستخدم وكلمة المرور", true);
+                return;
+            }
+
+            btn.classList.add('btn-loading');
+            btn.disabled = true;
+            printMsg("⏳ جاري التحقق من البيانات...");
+
+            try {
+                // 🔍 البحث عن المستخدم في Supabase
+                const { data, error } = await supabaseClient
+                    .from('users')
+                    .select('*')
+                    .eq('username', user)
+                    .eq('password', pass);
+
+                // لو في error أو مفيش بيانات
+                if (error) {
+                    console.error("خطأ في البحث:", error);
+                    btn.classList.remove('btn-loading'); btn.disabled = false;
+                    printMsg("❌ حدث خطأ في التحقق من البيانات", true);
+                    return;
+                }
+
+                // لو مفيش مستخدم
+                if (!data || data.length === 0) {
+                    btn.classList.remove('btn-loading'); btn.disabled = false;
+                    printMsg("❌ اسم المستخدم أو كلمة المرور غير صحيحة!", true);
+                    return;
+                }
+
+                // خد أول مستخدم
+                const foundUser = data[0];
+
+                // التحقق من الحساب
+                if (!foundUser.is_active) {
+                    btn.classList.remove('btn-loading'); btn.disabled = false;
+                    printMsg("⛔ عذراً: هذا الحساب موقوف من قبل الإدارة!", true);
+                    return;
+                }
+
+                // ✅ حفظ بيانات الجلسة
+                localStorage.setItem('active_store_id', foundUser.store_id);
+                localStorage.setItem('active_username', foundUser.username);
+                localStorage.setItem('active_staff_name', foundUser.full_name);
+                localStorage.setItem('active_staff_role', foundUser.role);
+                localStorage.setItem('is_super_admin', foundUser.is_super_admin || false);
+
+                // جلب اسم المتجر
+                try {
+                    const { data: storeData } = await supabaseClient
+                        .from('stores')
+                        .select('store_name')
+                        .eq('id', foundUser.store_id)
+                        .single();
+
+                    if (storeData) {
+                        localStorage.setItem('active_store_name', storeData.store_name);
+                    }
+                } catch (storeErr) {
+                    console.warn("مش عارف أجيب اسم المتجر:", storeErr);
+                }
+
+                printMsg(`👋 تم التحقق! مرحباً بك يا ${foundUser.full_name}..`);
+                setTimeout(() => { 
+                    window.location.href = "dashboard1.html"; 
+                }, 1000);
+
+            } catch (err) {
+                console.error("خطأ في الدخول:", err);
+                btn.classList.remove('btn-loading'); btn.disabled = false;
+                printMsg("❌ خطأ في الدخول: " + err.message, true);
+            }
+        }
+    </script>
+</body>
+</html>
