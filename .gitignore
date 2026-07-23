@@ -13,3 +13,5 @@ deploy/
 android/.idea/
 android/gradle/
 android/gradlew*
+*.zip
+*.ipa
